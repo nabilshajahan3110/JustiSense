@@ -23,8 +23,15 @@ def save_vectorstore(vectorstore, path="data/vectorstore.pkl"):
         pickle.dump(vectorstore, f)
 
 def load_vectorstore(path="data/vectorstore.pkl"):
-    with open(path, "rb") as f:
-        return pickle.load(f)
+    if os.path.exists(path):
+        with open(path, "rb") as f:
+            return pickle.load(f)
+    else:
+        print("🧠 vectorstore.pkl not found — building new one...")
+        docs = load_docs("data/")  # load from all PDFs
+        vectorstore = build_vectorstore(docs)
+        save_vectorstore(vectorstore, path)
+        return vectorstore
 
 def get_relevant_chunks(vectorstore, query, k=3):
     return vectorstore.similarity_search(query, k=k)
